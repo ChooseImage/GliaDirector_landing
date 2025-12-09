@@ -1,4 +1,3 @@
-import { useQueryState } from "nuqs";
 import VariableFontCursorProximity from "@/components/fancy/text/variable-font-cursor-proximity";
 import { cn } from "@/lib/utils";
 import { useRef, useState, useEffect } from "react";
@@ -112,13 +111,11 @@ function BackgroundVideo({
 function ParallaxCard({ 
     assistant, 
     index, 
-    setAssistantId, 
     containerRef,
     onHover
 }: { 
     assistant: Assistant;
     index: number;
-    setAssistantId: any;
     containerRef: React.RefObject<HTMLDivElement | null>;
     onHover: (data: { assistant: Assistant; x: MotionValue<number>; y: MotionValue<number> } | null) => void;
 }) {
@@ -286,7 +283,6 @@ function ParallaxCard({
 export function LandingPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [, setAssistantId] = useQueryState("assistantId");
   const [showLeftMask, setShowLeftMask] = useState(false);
   const [showRightMask, setShowRightMask] = useState(true);
   const [hoveredCard, setHoveredCard] = useState<{ 
@@ -410,7 +406,6 @@ export function LandingPage() {
                         key={index} 
                         assistant={assistant} 
                         index={index} 
-                        setAssistantId={setAssistantId}
                         containerRef={containerRef}
                         onHover={handleHover}
                     />
