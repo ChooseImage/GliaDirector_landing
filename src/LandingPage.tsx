@@ -1,10 +1,10 @@
-import { useQueryState } from "@/hooks/use-query-state";
+import { useQueryState } from "nuqs";
 import VariableFontCursorProximity from "@/components/fancy/text/variable-font-cursor-proximity";
 import { cn } from "@/lib/utils";
 import { useRef, useState, useEffect } from "react";
 import { DotScreenShader } from "@/components/ui/dot-shader-background";
 import { Button } from "@/components/ui/button";
-import { motion, useMotionValue, useTransform } from "framer-motion";
+import { motion, useMotionValue, useTransform, type MotionValue, AnimatePresence } from "framer-motion";
 
 type Assistant = {
   id: string;
@@ -14,6 +14,7 @@ type Assistant = {
   thumbnail: string;
   apiUrl?: string;
   externalUrl?: string;
+  bgVideoUrl?: string;
 };
 
 const ASSISTANTS: Assistant[] = [
@@ -21,43 +22,105 @@ const ASSISTANTS: Assistant[] = [
     id: "bumper",
     name: "Demy",
     role: "Bumper Ad Specialist",
-    description: "Punchy, short-form master designed to capture attention in seconds.",
+    description: "Punchy, short-form videos designed to capture attention in seconds.",
     thumbnail: "https://static-gstudio.gliacloud.com/10903/files/b4fab85fc99697b983019143de220c657de87a25.png",
-    apiUrl: "http://127.0.0.1:2024"
+    apiUrl: "http://127.0.0.1:2024",
+    bgVideoUrl: "https://static-gstudio.gliacloud.com/10903/files/c41597e0b6ab8cac129f8fef5ea5a4460c004ab0.mp4"
   },
   {
     id: "campaign",
     name: "Philippe",
     role: "Product Showcase",
-    description: "Detailed, stylish storytelling that puts your product in the best light.",
+    description: "Detailed storytelling that puts your product in the best light. Allows for more control over the narrative.",
     thumbnail: "https://static-gstudio.gliacloud.com/10903/files/e9774d4cc1fd5e776ad03c28e048ce78364d20ab.png",
-    apiUrl: "http://127.0.0.1:2024"
+    apiUrl: "http://127.0.0.1:2024",
+    bgVideoUrl: "https://static-gstudio.gliacloud.com/10903/files/9ac212f31135ab34d23e2852b25e34476164a67c.mp4"
   },
   {
     id: "agent",
     name: "Gabi",
     role: "Motion Graphics",
-    description: "High-energy kinetic typography and visuals for modern branding.",
+    description: "Versatile motion graphic designs and visuals for modern branding. Elevate your own assets with dynamic text animations.",
     thumbnail: "https://static-gstudio.gliacloud.com/10903/files/41ef2cf0a669585a476242377216f8655a3dfdcf.png",
-    externalUrl: "https://gliakinetics-115926812817.us-west1.run.app/"
+    externalUrl: "https://gliakinetics-115926812817.us-west1.run.app/",
+    bgVideoUrl: "https://static-gstudio.gliacloud.com/10903/files/f4083b4b982534a70d14ba0a3bf8de7790c3a474.mp4"
   },
   {
     id: "coming-soon",
     name: "More to Come",
     role: "",
     description: "We're continuously adding new specialized agents to enhance your creative projects.",
-    thumbnail: "https://static-gstudio.gliacloud.com/10903/files/3672d1b760e9ec0fd565a151b61bbe3162150c7e.jpg"
+    thumbnail: "https://static-gstudio.gliacloud.com/10903/files/3672d1b760e9ec0fd565a151b61bbe3162150c7e.jpg",
   }
 ];
+
+function BackgroundVideo({ 
+  assistant, 
+  x, 
+  y,
+  randX,
+  randY
+}: { 
+  assistant: Assistant; 
+  x: MotionValue<number>; 
+  y: MotionValue<number>;
+  randX: number;
+  randY: number;
+}) {
+  const rotateX = useTransform(y, [-0.5, 0.5], ["3deg", "-3deg"]);
+  const rotateY = useTransform(x, [-0.5, 0.5], ["-3deg", "3deg"]);
+  const moveX = useTransform(x, [-0.5, 0.5], ["-10px", "10px"]);
+  const moveY = useTransform(y, [-0.5, 0.5], ["-10px", "10px"]);
+
+  return (
+    <div className="fixed inset-0 z-0 pointer-events-none">
+      <div 
+        className="absolute -translate-x-1/2 -translate-y-1/2 w-[40vw] aspect-video transition-all duration-500 ease-out"
+        style={{
+            left: `${50 + randX}%`,
+            top: `${50 + randY}%`
+        }}
+      >
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
+          style={{
+            rotateX,
+            rotateY,
+            x: moveX,
+            y: moveY,
+            perspective: 1000
+          }}
+          className="w-full h-full relative"
+        >
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover rounded-2xl shadow-2xl opacity-40"
+            src={assistant.bgVideoUrl}
+          />
+        </motion.div>
+      </div>
+    </div>
+  );
+}
 
 function ParallaxCard({ 
     assistant, 
     index, 
-    containerRef 
+    setAssistantId, 
+    containerRef,
+    onHover
 }: { 
     assistant: Assistant;
     index: number;
+    setAssistantId: any;
     containerRef: React.RefObject<HTMLDivElement | null>;
+    onHover: (data: { assistant: Assistant; x: MotionValue<number>; y: MotionValue<number> } | null) => void;
 }) {
     const cardRef = useRef<HTMLDivElement>(null);
     const x = useMotionValue(0);
@@ -88,6 +151,11 @@ function ParallaxCard({
     const handleMouseLeave = () => {
         x.set(0);
         y.set(0);
+        onHover(null);
+    };
+
+    const handleMouseEnter = () => {
+        onHover({ assistant, x, y });
     };
 
     return (
@@ -99,6 +167,7 @@ function ParallaxCard({
                 ref={cardRef}
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
+                onMouseEnter={handleMouseEnter}
                 style={{
                     rotateX,
                     rotateY,
@@ -185,7 +254,7 @@ function ParallaxCard({
                     </div>
 
                     {/* Bottom Section - Button */}
-                    <div className="mt-40 flex justify-center w-full">
+                    <div className="mt-auto pt-40 flex justify-center w-full">
                         {assistant.role && (
                             <Button 
                                    onClick={() => {
@@ -217,9 +286,28 @@ function ParallaxCard({
 export function LandingPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  useQueryState("assistantId");
+  const [, setAssistantId] = useQueryState("assistantId");
   const [showLeftMask, setShowLeftMask] = useState(false);
   const [showRightMask, setShowRightMask] = useState(true);
+  const [hoveredCard, setHoveredCard] = useState<{ 
+    assistant: Assistant; 
+    x: MotionValue<number>; 
+    y: MotionValue<number>;
+    randX: number;
+    randY: number;
+  } | null>(null);
+
+  const handleHover = (data: { assistant: Assistant; x: MotionValue<number>; y: MotionValue<number> } | null) => {
+    if (data) {
+        setHoveredCard({
+            ...data,
+            randX: Math.random() * 45 - 15,
+            randY: Math.random() * 45 - 15
+        });
+    } else {
+        setHoveredCard(null);
+    }
+  };
 
   useEffect(() => {
     const checkScroll = () => {
@@ -259,6 +347,20 @@ export function LandingPage() {
         <div className="absolute inset-0 z-0">
              <DotScreenShader />
         </div>
+        
+        {/* Background Video Layer */}
+        <AnimatePresence>
+            {hoveredCard && hoveredCard.assistant.bgVideoUrl && (
+                <BackgroundVideo 
+                    key={hoveredCard.assistant.id}
+                    assistant={hoveredCard.assistant}
+                    x={hoveredCard.x}
+                    y={hoveredCard.y}
+                    randX={hoveredCard.randX}
+                    randY={hoveredCard.randY}
+                />
+            )}
+        </AnimatePresence>
 
       {/* Navbar Island */}
       <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-6 px-6 py-2 rounded-full border border-white/[0.08] bg-white/[0.02] backdrop-blur-[2px] pointer-events-auto">
@@ -308,7 +410,9 @@ export function LandingPage() {
                         key={index} 
                         assistant={assistant} 
                         index={index} 
+                        setAssistantId={setAssistantId}
                         containerRef={containerRef}
+                        onHover={handleHover}
                     />
                 ))}
                 <div className="w-12 flex-none" />
