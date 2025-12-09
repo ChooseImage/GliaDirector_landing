@@ -228,7 +228,7 @@ const VariableFontCursorProximity = forwardRef<HTMLElement, TextProps>(
     // Split text into words and track letter indices across all words
     const words = String(children).split(" ")
     let letterIndex = 0
-    const ElementTag = as
+    const ElementTag = as as any
 
     return (
       <ElementTag
