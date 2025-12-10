@@ -367,7 +367,7 @@ function ParallaxCard({
                             </div>
                             
                             {/* Videos Container - Scrollable */}
-                            <div className="flex-1 overflow-y-auto flex flex-col gap-4 pr-2">
+                            <div className="flex-1 overflow-y-auto flex flex-col gap-4 pr-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                                 {assistant.videos?.map((video, i) => (
                                     <div key={i} className="relative w-full aspect-video rounded-sm overflow-hidden border border-white/10 bg-black/50 flex-shrink-0">
                                          <video
@@ -483,7 +483,7 @@ export function LandingPage() {
         </AnimatePresence>
 
       {/* Navbar Island */}
-      <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-6 px-6 py-2 rounded-full border border-white/[0.08] bg-white/[0.02] backdrop-blur-[2px] pointer-events-auto">
+      <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-6 px-6 py-2 rounded-full border border-white/8 bg-white/2 backdrop-blur-[2px] pointer-events-auto">
           <a href="#glia-director" className="text-xs font-outfit hover:text-foreground transition-colors">GliaDirector</a>
           <a href="#pricing" className="text-xs font-outfit text-muted-foreground/60 hover:text-foreground transition-colors">Pricing</a>
       </nav>
