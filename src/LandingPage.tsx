@@ -13,7 +13,10 @@ type Assistant = {
   thumbnail: string;
   apiUrl?: string;
   externalUrl?: string;
-  bgVideoUrl?: string;
+  videos?: string[];
+  length?: string;
+  useCase?: string;
+
 };
 
 const ASSISTANTS: Assistant[] = [
@@ -24,7 +27,13 @@ const ASSISTANTS: Assistant[] = [
     description: "Punchy, short-form videos designed to capture attention in seconds.",
     thumbnail: "https://static-gstudio.gliacloud.com/10903/files/b4fab85fc99697b983019143de220c657de87a25.png",
     apiUrl: "http://127.0.0.1:2024",
-    bgVideoUrl: "https://static-gstudio.gliacloud.com/10903/files/c41597e0b6ab8cac129f8fef5ea5a4460c004ab0.mp4"
+    videos: [
+      "https://static-gstudio.gliacloud.com/10903/files/c41597e0b6ab8cac129f8fef5ea5a4460c004ab0.mp4",
+      "https://static-gstudio.gliacloud.com/10903/files/97c3a537c036362693c1f4fcaf27322e05c608a1.mp4",
+      "https://static-gstudio.gliacloud.com/10903/files/ce9c969b91a7875b8bf57fbeb4374e728cd96e25.mp4"
+    ],
+    length: "5-8 seconds",
+    useCase: "Banners, Social Feeds, Pre-roll"
   },
   {
     id: "campaign",
@@ -33,7 +42,13 @@ const ASSISTANTS: Assistant[] = [
     description: "Detailed storytelling that puts your product in the best light. Allows for more control over the narrative.",
     thumbnail: "https://static-gstudio.gliacloud.com/10903/files/e9774d4cc1fd5e776ad03c28e048ce78364d20ab.png",
     apiUrl: "http://127.0.0.1:2024",
-    bgVideoUrl: "https://static-gstudio.gliacloud.com/10903/files/9ac212f31135ab34d23e2852b25e34476164a67c.mp4"
+    videos: [
+      "https://static-gstudio.gliacloud.com/10903/files/9ac212f31135ab34d23e2852b25e34476164a67c.mp4",
+      "https://static-gstudio.gliacloud.com/10903/files/ce9c969b91a7875b8bf57fbeb4374e728cd96e25.mp4",
+      "https://static-gstudio.gliacloud.com/10903/files/0d2f60a4448779232b8515a979582c313bfec38d.mp4"
+    ],
+    length: "15-30 seconds",
+    useCase: "Product Launches, Feature Highlights, Explainers"
   },
   {
     id: "agent",
@@ -42,7 +57,13 @@ const ASSISTANTS: Assistant[] = [
     description: "Versatile motion graphic designs and visuals for modern branding. Elevate your own assets with dynamic text animations.",
     thumbnail: "https://static-gstudio.gliacloud.com/10903/files/41ef2cf0a669585a476242377216f8655a3dfdcf.png",
     externalUrl: "https://gliakinetics-115926812817.us-west1.run.app/",
-    bgVideoUrl: "https://static-gstudio.gliacloud.com/10903/files/f4083b4b982534a70d14ba0a3bf8de7790c3a474.mp4"
+    videos: [
+      "https://static-gstudio.gliacloud.com/10903/files/f4083b4b982534a70d14ba0a3bf8de7790c3a474.mp4",
+      "https://static-gstudio.gliacloud.com/10903/files/f5e4585bab26b858cb26c5c96118f88b88ec413b.mp4",
+      "https://static-gstudio.gliacloud.com/10903/files/4a657d53679988602bd80696f19eb5206275d45f.mp4"
+    ],
+    length: "custom",
+    useCase: "Brand Videos, Social Media, Intros"
   },
   {
     id: "coming-soon",
@@ -99,8 +120,8 @@ function BackgroundVideo({
             loop
             muted
             playsInline
-            className="w-full h-full object-cover rounded-2xl shadow-2xl opacity-40"
-            src={assistant.bgVideoUrl}
+            className="w-full h-full object-cover rounded-2xl shadow-2xl opacity-40 blur-xl"
+            src={assistant.videos?.[0]}
           />
         </motion.div>
       </div>
@@ -120,6 +141,7 @@ function ParallaxCard({
     onHover: (data: { assistant: Assistant; x: MotionValue<number>; y: MotionValue<number> } | null) => void;
 }) {
     const cardRef = useRef<HTMLDivElement>(null);
+    const [isFlipped, setIsFlipped] = useState(false);
     const x = useMotionValue(0);
     const y = useMotionValue(0);
 
@@ -170,111 +192,213 @@ function ParallaxCard({
                     rotateY,
                     transformStyle: "preserve-3d"
                 }}
-                className="relative flex flex-col h-full w-full rounded-3xl border border-transparent bg-transparent hover:bg-white/[0.02] hover:shadow-[0_0_60px_-15px_rgba(255,255,255,0.05)] transition-colors duration-700 ease-out p-6 md:p-8 pointer-events-auto"
+                className="relative flex flex-col h-full w-full transition-colors duration-700 ease-out pointer-events-auto"
             >
-                {/* Tech Markers */}
-                <motion.div 
-                    className="absolute top-8 left-8 z-20 flex flex-col gap-2"
-                    style={{ x: textX, y: textY, translateZ: 20 }}
+                {/* Flip Container */}
+                <motion.div
+                    className="relative w-full h-full"
+                    style={{ transformStyle: "preserve-3d" }}
+                    animate={{ rotateY: isFlipped ? 180 : 0 }}
+                    transition={{ type: "spring", stiffness: 260, damping: 20 }}
                 >
-                    <span className="text-xs font-outfit font-medium text-muted-foreground/40 group-hover:text-brand1 transition-colors duration-300">
-                        0{index + 1}
-                    </span>
-                </motion.div>
-                
-                <motion.div 
-                    className="absolute top-8 right-8 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100"
-                    style={{ x: textX, y: textY, translateZ: 20 }}
-                >
-                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-brand1">
-                        <path d="M1 1H11V11" stroke="currentColor" strokeWidth="1"/>
-                     </svg>
-                </motion.div>
-
-                {/* Content */}
-                <div className="flex flex-col h-full z-10" style={{ transform: "translateZ(30px)" }}>
-                    
-                    {/* Top Section Group */}
-                    <div className="w-full flex flex-col gap-6">
-                        {/* Name */}
-                         <motion.div 
-                            className="mt-8 h-16 w-full flex items-center justify-start"
-                            style={{ x: textX, y: textY }}
-                         >
-                            {assistant.role && (
-                             <VariableFontCursorProximity
-                                className={cn("text-5xl md:text-6xl font-cormorant font-normal text-foreground")}
-                                fromFontVariationSettings="'wght' 100"
-                                toFontVariationSettings="'wght' 900"
-                                radius={90}
-                                containerRef={containerRef}
-                            >
-                                {assistant.name}
-                            </VariableFontCursorProximity>
-                            )}
-                            {!assistant.role && (
-                                <h2 className="text-3xl mt-4 md:text-4xl font-cormorant font-light text-foreground">
-                                    More Specialists comming soon
-                                </h2>
-                            )}
+                    {/* Front Face */}
+                    <div 
+                        className="relative flex flex-col h-full w-full rounded-3xl border border-transparent bg-transparent backdrop-blur-xl group-hover:shadow-[0_0_6px_-15px_rgba(255,255,255,0.01)] transition-colors duration-700 ease-out p-6 md:p-8"
+                        style={{ backfaceVisibility: "hidden", pointerEvents: isFlipped ? "none" : "auto" }}
+                    >
+                        {/* Tech Markers */}
+                        <motion.div 
+                            className="absolute top-8 left-8 z-20 flex flex-col gap-2"
+                            style={{ x: textX, y: textY, translateZ: 20 }}
+                        >
+                            <span className="text-xs font-outfit font-medium text-muted-foreground/40 group-hover:text-brand1 transition-colors duration-300">
+                                0{index + 1}
+                            </span>
+                        </motion.div>
+                        
+                        <motion.div 
+                            className="absolute top-8 right-8 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100"
+                            style={{ x: textX, y: textY, translateZ: 20 }}
+                        >
+                             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-brand1">
+                                <path d="M1 1H11V11" stroke="currentColor" strokeWidth="1"/>
+                             </svg>
                         </motion.div>
 
-                        {/* Image */}
-                        <motion.div 
-                            className="relative w-full h-[240px] flex items-center justify-center"
-                            style={{ x: imageX, y: imageY, translateZ: -50 }}
-                        >
-                            <img 
-                                src={assistant.thumbnail} 
-                                alt={assistant.name}
-                                className="w-full h-full object-cover transition-all duration-700 ease-out transform"
-                            />
-                        </motion.div>
+                        {/* Content */}
+                        <div className="flex flex-col h-full z-10" style={{ transform: "translateZ(30px)" }}>
+                            
+                            {/* Top Section Group */}
+                            <div className="w-full flex flex-col gap-6">
+                                {/* Name */}
+                                 <motion.div 
+                                    className="mt-8 h-16 w-full flex items-center justify-start"
+                                    style={{ x: textX, y: textY }}
+                                 >
+                                    {assistant.role && (
+                                     <VariableFontCursorProximity
+                                        className={cn("text-5xl md:text-6xl font-cormorant font-normal text-foreground")}
+                                        fromFontVariationSettings="'wght' 100"
+                                        toFontVariationSettings="'wght' 900"
+                                        radius={90}
+                                        containerRef={containerRef}
+                                    >
+                                      {assistant.name}
+                                    </VariableFontCursorProximity>
+                                    )}
+                                    {!assistant.role && (
+                                        <h2 className="text-3xl mt-4 md:text-4xl font-cormorant font-light text-foreground">
+                                            More Specialists coming soon
+                                        </h2>
+                                    )}
+                                </motion.div>
 
-                        {/* Text Info */}
-                        <motion.div 
-                            className="flex flex-col items-center gap-3 text-center"
-                            style={{ x: textX, y: textY }}
-                        >
-                            {assistant.role && (
-                                <div className="inline-block px-3 py-1 border border-white/10 rounded-full bg-white/[0.01] backdrop-blur-md group-hover:border-white/20 transition-colors duration-500">
-                                     <p className="text-[10px] md:text-xs font-outfit tracking-[0.2em] uppercase text-foreground group-hover:text-foreground transition-colors duration-300">
-                                        {assistant.role}
+                                {/* Image */}
+                                <motion.div 
+                                    className="relative w-full h-[240px] flex items-center justify-center"
+                                    style={{ x: imageX, y: imageY, translateZ: -50 }}
+                                >
+                                    <img 
+                                        src={assistant.thumbnail} 
+                                        alt={assistant.name}
+                                        className="w-full h-full object-cover transition-all duration-700 ease-out transform"
+                                    />
+                                </motion.div>
+
+                                {/* Text Info */}
+                                <motion.div 
+                                    className="flex flex-col items-center gap-3 text-center"
+                                    style={{ x: textX, y: textY }}
+                                >
+                                    {assistant.role && (
+                                        <div className="inline-block px-3 py-1 border border-white/10 rounded-full bg-white/[0.01] backdrop-blur-md group-hover:border-white/20 transition-colors duration-500">
+                                             <p className="text-[10px] md:text-xs font-outfit tracking-[0.2em] uppercase text-foreground group-hover:text-foreground transition-colors duration-300">
+                                                {assistant.role}
+                                            </p>
+                                        </div>
+                                    )}
+                                   
+                                    <p className="text-sm font-light text-foreground/60 max-w-[240px] leading-relaxed transition-all duration-500">
+                                        {assistant.description}
                                     </p>
+                                </motion.div>
+                            </div>
+
+                            {/* Bottom Section - Buttons */}
+                            <div className="mt-auto pt-32 flex justify-center items-center gap-3 w-full">
+                                {assistant.role && (
+                                    <>
+                                        <Button 
+                                            onClick={() => {
+                                                if (assistant.externalUrl) {
+                                                    window.location.href = assistant.externalUrl;
+                                                } else {
+                                                        const url = new URL(window.location.href);
+                                                        url.searchParams.set("assistantId", assistant.id);
+                                                        if (assistant.apiUrl) {
+                                                            url.searchParams.set("apiUrl", assistant.apiUrl);
+                                                        }
+                                                        window.location.href = url.toString();
+                                                }
+                                            }}
+                                            variant="glass" 
+                                            className={cn("border-white/10 hover:border-white/50 hover:bg-white/10 text-xs px-6 h-9 rounded-full transition-all duration-300", isFlipped ? "pointer-events-none" : "pointer-events-auto")}
+                                        >
+                                            Work with {assistant.name}
+                                        </Button>
+                                        <Button 
+                                            onClick={(e: any) => {
+                                                e.stopPropagation();
+                                                setIsFlipped(true);
+                                            }}
+                                            variant="glass" 
+                                            size="sm"
+                                            className={cn("border-white/10 hover:border-white/50 hover:bg-white/10 text-xs px-3 h-9 rounded-full transition-all duration-300", isFlipped ? "pointer-events-none" : "pointer-events-auto")}
+                                        >
+                                            View more
+                                        </Button>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Back Face */}
+                    <div 
+                        className="absolute inset-0 h-full w-full"
+                        style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)", pointerEvents: isFlipped ? "auto" : "none" }}
+                    >
+                         {/* Background Layer */}
+                         <div className="absolute inset-0 w-full h-full rounded-3xl border border-white/10 bg-black/80 backdrop-blur-[2px]" />
+
+                         {/* Content Layer */}
+                         <div className="relative flex flex-col h-full w-full p-6 md:p-8">
+                             <div className="flex flex-col h-full gap-4">
+                            {/* Header */}
+                            <div className="flex justify-between items-center flex-shrink-0">
+                                <h3 className="text-4xl font-cormorant italic font-light text-foreground">{assistant.name}</h3>
+                                <div className="px-2 py-1 rounded-full bg-white/5 border border-white/10">
+                                    <p className="text-[10px] font-outfit tracking-widest uppercase text-muted-foreground">{assistant.role}</p>
                                 </div>
-                            )}
-                           
-                            <p className="text-sm font-light text-foreground/60 max-w-[240px] leading-relaxed transition-all duration-500">
-                                {assistant.description}
-                            </p>
-                        </motion.div>
-                    </div>
+                            </div>
 
-                    {/* Bottom Section - Button */}
-                    <div className="mt-auto pt-40 flex justify-center w-full">
-                        {assistant.role && (
-                            <Button 
-                                   onClick={() => {
-                                       if (assistant.externalUrl) {
-                                           window.location.href = assistant.externalUrl;
-                                       } else {
-                                            const url = new URL(window.location.href);
-                                            url.searchParams.set("assistantId", assistant.id);
-                                            if (assistant.apiUrl) {
-                                                url.searchParams.set("apiUrl", assistant.apiUrl);
-                                            }
-                                            window.location.href = url.toString();
-                                       }
-                                   }}
-                                   variant="glass" 
-                                   className="border-white/10 hover:border-white/50 hover:bg-white/10 text-xs px-6 h-9 rounded-full transition-all duration-300 pointer-events-auto"
-                               >
-                                   Work with {assistant.name}
-                            </Button>
-                        )}
-                    </div>
+                            {/* Length & Features */}
+                            <div className="flex flex-col gap-3 py-4 flex-shrink-0">
+                                <div className="grid grid-cols-2 gap-4">
+                                    {assistant.length && (
+                                        <div className="flex flex-col gap-1">
+                                            <span className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-space">Length</span>
+                                            <span className="text-xs text-foreground/90 font-space">{assistant.length}</span>
+                                        </div>
+                                    )}
+                                    {assistant.useCase && (
+                                        <div className="flex flex-col gap-1">
+                                             <span className="text-[10px] uppercase tracking-widest text-muted-foreground/60 font-space">Features</span>
+                                             <div className="flex flex-wrap gap-1">
+                                                {assistant.useCase.split(',').map((feature, i) => (
+                                                    <span key={i} className="px-1.5 py-0.5 rounded-sm bg-white/5 border border-white/10 text-[10px] text-foreground/80 font-space">
+                                                        {feature.trim()}
+                                                    </span>
+                                                ))}
+                                             </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            
+                            {/* Videos Container - Scrollable */}
+                            <div className="flex-1 overflow-y-auto flex flex-col gap-4 pr-2">
+                                {assistant.videos?.map((video, i) => (
+                                    <div key={i} className="relative w-full aspect-video rounded-sm overflow-hidden border border-white/10 bg-black/50 flex-shrink-0">
+                                         <video
+                                            autoPlay
+                                            loop
+                                            muted
+                                            playsInline
+                                            className={cn("w-full h-full object-cover", i > 0 && "opacity-80")}
+                                            src={video}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
 
-                </div>
+                             {/* Back Button */}
+                             <div className="flex justify-end w-full pt-4 flex-shrink-0">
+                                <Button 
+                                    onClick={(e: any) => {
+                                        e.stopPropagation();
+                                        setIsFlipped(false);
+                                    }}
+                                    variant="glass" 
+                                    className={cn("border-white/10 hover:border-white/50 hover:bg-white/10 text-xs px-6 h-9 rounded-full transition-all duration-300", !isFlipped ? "pointer-events-none" : "pointer-events-auto")}
+                                >
+                                    Back
+                                </Button>
+                             </div>
+                         </div>
+                       </div>
+                    </div>
+                </motion.div>
             </motion.div>
         </div>
     );
@@ -346,7 +470,7 @@ export function LandingPage() {
         
         {/* Background Video Layer */}
         <AnimatePresence>
-            {hoveredCard && hoveredCard.assistant.bgVideoUrl && (
+            {hoveredCard && hoveredCard.assistant.videos?.[0] && (
                 <BackgroundVideo 
                     key={hoveredCard.assistant.id}
                     assistant={hoveredCard.assistant}
@@ -360,8 +484,8 @@ export function LandingPage() {
 
       {/* Navbar Island */}
       <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-6 px-6 py-2 rounded-full border border-white/[0.08] bg-white/[0.02] backdrop-blur-[2px] pointer-events-auto">
-          <span className="text-sm font-outfit font-medium text-foreground tracking-tight">GliaDirector</span>
-          <a href="#" className="text-xs font-outfit text-muted-foreground/60 hover:text-foreground transition-colors">Pricing</a>
+          <a href="#glia-director" className="text-xs font-outfit hover:text-foreground transition-colors">GliaDirector</a>
+          <a href="#pricing" className="text-xs font-outfit text-muted-foreground/60 hover:text-foreground transition-colors">Pricing</a>
       </nav>
 
       {/* Header */}
@@ -417,5 +541,3 @@ export function LandingPage() {
     </div>
   );
 }
-
-//className="group relative flex-1 flex flex-col rounded-xl border border-white/10 bg-white/[0.02] backdrop-blur-md cursor-pointer transition-all duration-500 hover:bg-white/[0.05] hover:border-white/30 overflow-hidden shadow-glass pointer-events-auto"
