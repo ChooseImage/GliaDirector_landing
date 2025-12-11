@@ -443,6 +443,43 @@ export function LandingPage() {
     return () => window.removeEventListener('resize', checkScroll);
   }, []);
 
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const onWheel = (e: WheelEvent) => {
+      if (e.deltaY === 0) return;
+
+      // Check if the scroll target is within a nested scrollable element
+      let currentTarget = e.target as HTMLElement | null;
+      let isNestedScrollable = false;
+
+      while (currentTarget && currentTarget !== container) {
+        const style = window.getComputedStyle(currentTarget);
+        const overflowY = style.overflowY;
+        const isScrollableY = (overflowY === 'auto' || overflowY === 'scroll') && 
+                             currentTarget.scrollHeight > currentTarget.clientHeight;
+        
+        if (isScrollableY) {
+          isNestedScrollable = true;
+          break;
+        }
+        currentTarget = currentTarget.parentElement;
+      }
+
+      if (!isNestedScrollable) {
+        e.preventDefault();
+        container.scrollLeft += e.deltaY;
+      }
+    };
+
+    container.addEventListener("wheel", onWheel, { passive: false });
+
+    return () => {
+      container.removeEventListener("wheel", onWheel);
+    };
+  }, []);
+
   const handleScroll = () => {
       if (scrollContainerRef.current) {
         const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
