@@ -149,11 +149,11 @@ function ParallaxCard({
     const rotateY = useTransform(x, [-0.5, 0.5], ["-3deg", "3deg"]);
     
     // Parallax layers
-    const imageX = useTransform(x, [-0.5, 0.5], ["-1px", "1px"]);
-    const imageY = useTransform(y, [-0.5, 0.5], ["-1px", "1px"]);
+    const imageX = useTransform(x, [-0.5, 0.5], ["-2px", "2px"]);
+    const imageY = useTransform(y, [-0.5, 0.5], ["-2px", "2px"]);
 
-    const textX = useTransform(x, [-0.5, 0.5], ["-2px", "2px"]);
-    const textY = useTransform(y, [-0.5, 0.5], ["-2px", "2px"]);
+    const textX = useTransform(x, [-0.5, 0.5], ["-4px", "4px"]);
+    const textY = useTransform(y, [-0.5, 0.5], ["-4px", "4px"]);
 
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
         if (!cardRef.current) return;
@@ -332,18 +332,24 @@ function ParallaxCard({
                          <div className="absolute inset-0 w-full h-full rounded-3xl border border-white/10 bg-black/80 backdrop-blur-[2px]" />
 
                          {/* Content Layer */}
-                         <div className="relative flex flex-col h-full w-full p-6 md:p-8">
+                         <div className="relative flex flex-col h-full w-full p-6 md:p-8" style={{ transform: "translateZ(30px)" }}>
                              <div className="flex flex-col h-full gap-4">
                             {/* Header */}
-                            <div className="flex justify-between items-center flex-shrink-0">
+                            <motion.div 
+                                className="flex justify-between items-center flex-shrink-0"
+                                style={{ x: textX, y: textY }}
+                            >
                                 <h3 className="text-4xl font-cormorant italic font-light text-foreground">{assistant.name}</h3>
                                 <div className="px-2 py-1 rounded-full bg-white/5 border border-white/10">
                                     <p className="text-[10px] font-outfit tracking-widest uppercase text-muted-foreground">{assistant.role}</p>
                                 </div>
-                            </div>
+                            </motion.div>
 
                             {/* Length & Features */}
-                            <div className="flex flex-col gap-3 py-4 flex-shrink-0">
+                            <motion.div 
+                                className="flex flex-col gap-3 py-4 flex-shrink-0"
+                                style={{ x: textX, y: textY }}
+                            >
                                 <div className="grid grid-cols-2 gap-4">
                                     {assistant.length && (
                                         <div className="flex flex-col gap-1">
@@ -364,10 +370,13 @@ function ParallaxCard({
                                         </div>
                                     )}
                                 </div>
-                            </div>
+                            </motion.div>
                             
                             {/* Videos Container - Scrollable */}
-                            <div className="flex-1 overflow-y-auto flex flex-col gap-4 pr-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                            <motion.div 
+                                className="flex-1 overflow-y-auto rounded-lg flex flex-col gap-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+                                style={{ x: imageX, y: imageY, translateZ: -20 }}
+                            >
                                 {assistant.videos?.map((video, i) => (
                                     <div key={i} className="relative w-full aspect-video rounded-sm overflow-hidden border border-white/10 bg-black/50 flex-shrink-0">
                                          <video
@@ -380,10 +389,13 @@ function ParallaxCard({
                                         />
                                     </div>
                                 ))}
-                            </div>
+                            </motion.div>
 
                              {/* Back Button */}
-                             <div className="flex justify-end w-full pt-4 flex-shrink-0">
+                             <motion.div 
+                                className="flex justify-end w-full pt-4 flex-shrink-0"
+                                style={{ x: textX, y: textY }}
+                             >
                                 <Button 
                                     onClick={(e: any) => {
                                         e.stopPropagation();
@@ -394,7 +406,7 @@ function ParallaxCard({
                                 >
                                     Back
                                 </Button>
-                             </div>
+                             </motion.div>
                          </div>
                        </div>
                     </div>
